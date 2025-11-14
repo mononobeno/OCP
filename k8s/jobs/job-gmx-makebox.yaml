@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: gmx-makebox
+  namespace: drug-pipeline
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: gmx-makebox
+          image: gromacs-mpi-cuda:local
+          envFrom:
+            - configMapRef:
+                name: pipeline-config
+          volumeMounts:
+            - name: work
+              mountPath: /workspace
+          command:
+            - bash
+            - -c
+            - |
+              echo "[INFO] gmx-makebox: GROMACS で box 作成 & solvate & grompp(em) を実行する想定"
+              # TODO: gmx editconf / solvate / grompp を使って /workspace/gmx_em に em.tpr 等を生成
+      volumes:
+        - name: work
+          persistentVolumeClaim:
+            claimName: work-pvc
+  backoffLimit: 0

@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: gmx-production
+  namespace: drug-pipeline
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: gmx-production
+          image: gromacs-mpi-cuda:local
+          envFrom:
+            - configMapRef:
+                name: pipeline-config
+          volumeMounts:
+            - name: work
+              mountPath: /workspace
+          command:
+            - bash
+            - -c
+            - |
+              echo "[INFO] gmx-production: Production run を実行する想定"
+              # TODO: grompp (md) → mdrun -deffnm md 等
+      volumes:
+        - name: work
+          persistentVolumeClaim:
+            claimName: work-pvc
+  backoffLimit: 0

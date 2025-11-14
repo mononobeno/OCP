@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: vina-prep
+  namespace: drug-pipeline
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: vina-prep
+          image: pipeline/vina-prep:local
+          envFrom:
+            - configMapRef:
+                name: pipeline-config
+          volumeMounts:
+            - name: work
+              mountPath: /workspace
+          command:
+            - bash
+            - -c
+            - |
+              echo "[INFO] vina-prep: receptor PDB → PDBQT, ligands → PDBQT 変換を行う想定"
+              # TODO: prepare_receptor4.py / prepare_ligand4.py 等で /workspace/vina_input を生成
+      volumes:
+        - name: work
+          persistentVolumeClaim:
+            claimName: work-pvc
+  backoffLimit: 0

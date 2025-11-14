@@ -1,0 +1,34 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ligand-selector
+  namespace: drug-pipeline
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: ligand-selector
+          image: pipeline/ligand-selector:local
+          envFrom:
+            - configMapRef:
+                name: pipeline-config
+          volumeMounts:
+            - name: zinc-library
+              mountPath: /zinc
+            - name: work
+              mountPath: /workspace
+          command:
+            - bash
+            - -c
+            - |
+              echo "[INFO] ligand-selector: ZINC から LIGAND_SAMPLE_COUNT 件を抽出して ligands_raw にコピーする想定"
+              # TODO: /zinc 以下からランダム or 指定条件でファイル選択して /workspace/ligands_raw に配置
+      volumes:
+        - name: zinc-library
+          persistentVolumeClaim:
+            claimName: zinc-library-pvc
+        - name: work
+          persistentVolumeClaim:
+            claimName: work-pvc
+  backoffLimit: 0

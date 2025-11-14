@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: zinc-library-pvc
+  namespace: drug-pipeline
+spec:
+  accessModes:
+    - ReadOnlyMany
+  resources:
+    requests:
+      storage: 100Gi
+  # kind のデフォルト StorageClass を利用する場合は storageClassName は省略推奨
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: work-pvc
+  namespace: drug-pipeline
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 50Gi

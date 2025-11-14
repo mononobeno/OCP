@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: vina2gromacs-prep
+  namespace: drug-pipeline
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: vina2gromacs-prep
+          image: pipeline/vina2gromacs-prep:local
+          envFrom:
+            - configMapRef:
+                name: pipeline-config
+          volumeMounts:
+            - name: work
+              mountPath: /workspace
+          command:
+            - bash
+            - -c
+            - |
+              echo "[INFO] vina2gromacs-prep: Vina の上位 pose を抽出し GROMACS 用構造/トポロジを生成する想定"
+              # TODO: vina out.pdbqt → PDB → GMX 用 .gro/.top/.itp を /workspace/gmx_input に作成
+      volumes:
+        - name: work
+          persistentVolumeClaim:
+            claimName: work-pvc
+  backoffLimit: 0

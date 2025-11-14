@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: gmx-minimize
+  namespace: drug-pipeline
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: gmx-minimize
+          image: gromacs-mpi-cuda:local
+          envFrom:
+            - configMapRef:
+                name: pipeline-config
+          volumeMounts:
+            - name: work
+              mountPath: /workspace
+          command:
+            - bash
+            - -c
+            - |
+              echo "[INFO] gmx-minimize: エネルギー最小化 (mdrun -deffnm em) を実行する想定"
+              # TODO: mpirun -np ${NP} gmx_mpi mdrun -deffnm em など
+      volumes:
+        - name: work
+          persistentVolumeClaim:
+            claimName: work-pvc
+  backoffLimit: 0

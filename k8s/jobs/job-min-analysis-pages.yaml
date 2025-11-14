@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: min-analysis-pages
+  namespace: drug-pipeline
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: min-analysis-pages
+          image: pipeline/analysis-pages:local
+          envFrom:
+            - configMapRef:
+                name: pipeline-config
+          volumeMounts:
+            - name: work
+              mountPath: /workspace
+          command:
+            - bash
+            - -c
+            - |
+              echo "[INFO] min-analysis-pages: 最小化結果の評価 + GitHub Pages へのレポート更新を行う想定"
+              # TODO: gmx energy / gmx rms で結果解析し /workspace/reports に HTML/Markdown を出力 → git push
+      volumes:
+        - name: work
+          persistentVolumeClaim:
+            claimName: work-pvc
+  backoffLimit: 0

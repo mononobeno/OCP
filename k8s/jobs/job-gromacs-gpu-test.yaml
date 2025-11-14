@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: gromacs-gpu-test
+  namespace: drug-pipeline
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: gromacs-gpu-test
+          image: gromacs-mpi-cuda:local
+          imagePullPolicy: Never
+          command: 
+            - bash
+            - -c
+            - |
+              echo "========================================"
+              echo "NVIDIA GPU Test (nvidia-smi)"
+              echo "========================================"
+              if command -v nvidia-smi &> /dev/null; then
+                nvidia-smi || echo "nvidia-smi command exists but failed (GPU may not be available)"
+              else
+                echo "nvidia-smi not found (expected in container without GPU runtime)"
+              fi
+              echo
+              echo "========================================"
+              echo "GROMACS MPI Version"
+              echo "========================================"
+              gmx_mpi --version
+              echo
+              echo "========================================"
+              echo "Test completed successfully"
+              echo "========================================"
+          # Remove GPU resource request for testing in kind without GPU support
+          # resources:
+          #   limits:
+          #     nvidia.com/gpu: 1
+  backoffLimit: 0
