@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: gmx-version-test
+  namespace: drug-pipeline
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: gmx-version
+          image: ocp/gromacs-mpi-cuda:local
+          command: ["bash", "-c", "gmx_mpi --version && sleep 5"]
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+  backoffLimit: 0
