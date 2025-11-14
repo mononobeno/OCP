@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: gpu-nvidia-smi
+  namespace: drug-pipeline
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: nvidia-smi
+          image: nvidia/cuda:12.2.0-base-ubuntu22.04
+          command: ["bash", "-c", "nvidia-smi && sleep 5"]
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+  backoffLimit: 0
