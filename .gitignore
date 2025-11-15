@@ -1,0 +1,34 @@
+# Database files
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+
+# Generated PDBQT files
+catalog/libraries/*/processed/pdbqt/*.pdbqt
+
+# Raw data archives
+catalog/libraries/*/raw/*.tar.gz
+catalog/libraries/*/raw/*.smi.gz
+
+# Temporary files
+*.tmp
+/tmp/
+.vscode/
+
+# Build artifacts
+__pycache__/
+*.pyc
+*.pyo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Archive files
+*.tar.gz
+catalog-data.tar.gz
+
+# Specific large data files
+catalog/libraries/zinc_2d_smi_v1/raw/ZINC20-ML_smiles.tar.gz
+catalog/libraries/zinc_2d_smi_v1/raw/all_zinc20_ml_subset.smi

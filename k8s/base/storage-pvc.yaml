@@ -5,10 +5,10 @@ metadata:
   namespace: drug-pipeline
 spec:
   accessModes:
-    - ReadOnlyMany
+    - ReadWriteOnce  # kind の local-path は ReadWriteOnce のみサポート
   resources:
     requests:
-      storage: 100Gi
+      storage: 10Gi  # テスト用に容量を削減
   # kind のデフォルト StorageClass を利用する場合は storageClassName は省略推奨
 
 ---
@@ -19,7 +19,7 @@ metadata:
   namespace: drug-pipeline
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce  # kind の local-path は ReadWriteOnce のみサポート
   resources:
     requests:
-      storage: 50Gi
+      storage: 5Gi  # テスト用に容量を削減

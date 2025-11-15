@@ -4,13 +4,6 @@ metadata:
   name: pipeline-config
   namespace: drug-pipeline
 data:
-  RECEPTOR_PATH: /workspace/receptor/receptor.pdb
-  LIGANDS_RAW_DIR: /workspace/ligands_raw
-  VINA_INPUT_DIR: /workspace/vina_input
-  VINA_OUTPUT_DIR: /workspace/vina_output
-  GMX_INPUT_DIR: /workspace/gmx_input
-  GMX_EM_DIR: /workspace/gmx_em
-  GMX_EQ_DIR: /workspace/gmx_eq
-  GMX_MD_DIR: /workspace/gmx_md
-  REPORT_DIR: /workspace/reports
-  LIGAND_SAMPLE_COUNT: "100"
+  targetCode: "aps_apoh"
+  libraryCode: "zinc_2d_smi_v1"
+  numLigands: "50"

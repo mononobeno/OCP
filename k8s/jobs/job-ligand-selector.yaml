@@ -4,31 +4,67 @@ metadata:
   name: ligand-selector
   namespace: drug-pipeline
 spec:
+  backoffLimit: 0
   template:
     spec:
       restartPolicy: Never
+      initContainers:
+        # データベースファイルを zinc-library PVC にコピー
+        - name: init-db
+          image: busybox:latest
+          command:
+            - sh
+            - -c
+            - |
+              mkdir -p /zinc-library/db
+              if [ ! -f /zinc-library/db/ocp_results.sqlite ]; then
+                echo "[INIT] Copying database from ConfigMap to PVC..."
+                cp /db-source/ocp_results.sqlite /zinc-library/db/ocp_results.sqlite
+                echo "[INIT] Database copied successfully"
+              else
+                echo "[INIT] Database already exists, skipping copy"
+              fi
+          volumeMounts:
+            - name: zinc-library
+              mountPath: /zinc-library
+            - name: db-source
+              mountPath: /db-source
       containers:
         - name: ligand-selector
           image: pipeline/ligand-selector:local
-          envFrom:
-            - configMapRef:
-                name: pipeline-config
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: TARGET_CODE
+              valueFrom:
+                configMapKeyRef:
+                  name: pipeline-config
+                  key: targetCode
+            - name: LIBRARY_CODE
+              valueFrom:
+                configMapKeyRef:
+                  name: pipeline-config
+                  key: libraryCode
+            - name: NUM_LIGANDS
+              valueFrom:
+                configMapKeyRef:
+                  name: pipeline-config
+                  key: numLigands
+            - name: DB_PATH
+              value: /zinc-library/db/ocp_results.sqlite
+            - name: WORKSPACE
+              value: /workspace
           volumeMounts:
-            - name: zinc-library
-              mountPath: /zinc
-            - name: work
+            - name: work-pvc
               mountPath: /workspace
-          command:
-            - bash
-            - -c
-            - |
-              echo "[INFO] ligand-selector: ZINC から LIGAND_SAMPLE_COUNT 件を抽出して ligands_raw にコピーする想定"
-              # TODO: /zinc 以下からランダム or 指定条件でファイル選択して /workspace/ligands_raw に配置
+            - name: zinc-library
+              mountPath: /zinc-library
       volumes:
+        - name: work-pvc
+          persistentVolumeClaim:
+            claimName: work-pvc
         - name: zinc-library
           persistentVolumeClaim:
             claimName: zinc-library-pvc
-        - name: work
-          persistentVolumeClaim:
-            claimName: work-pvc
-  backoffLimit: 0
+        - name: db-source
+          configMap:
+            name: ocp-database

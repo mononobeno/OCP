@@ -1,0 +1,68 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: catalog-loader
+  namespace: drug-pipeline
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: catalog-loader
+          image: busybox:latest
+          command:
+            - sh
+            - -c
+            - |
+              echo "[CATALOG-LOADER] Starting..."
+              
+              # マーカーファイルの確認
+              if [ -f /zinc-library/.catalog_loaded ]; then
+                echo "[CATALOG-LOADER] Catalog already loaded (marker found), skipping"
+                exit 0
+              fi
+              
+              echo "[CATALOG-LOADER] Setting up directory structure..."
+              mkdir -p /zinc-library/targets
+              mkdir -p /zinc-library/libraries
+              mkdir -p /zinc-library/db
+              
+              echo "[CATALOG-LOADER] Copying targets..."
+              if [ -d /catalog-data/targets ] && [ "$(ls -A /catalog-data/targets)" ]; then
+                cp -rv /catalog-data/targets/* /zinc-library/targets/
+                echo "[CATALOG-LOADER] Targets copied"
+              else
+                echo "[CATALOG-LOADER] No targets found in /catalog-data/targets"
+              fi
+              
+              echo "[CATALOG-LOADER] Copying libraries..."
+              if [ -d /catalog-data/libraries ] && [ "$(ls -A /catalog-data/libraries)" ]; then
+                cp -rv /catalog-data/libraries/* /zinc-library/libraries/
+                echo "[CATALOG-LOADER] Libraries copied"
+              else
+                echo "[CATALOG-LOADER] No libraries found in /catalog-data/libraries"
+              fi
+              
+              echo "[CATALOG-LOADER] Catalog data loaded successfully"
+              
+              # マーカーファイルを作成
+              date > /zinc-library/.catalog_loaded
+              echo "[CATALOG-LOADER] Marker file created"
+              
+              echo "[CATALOG-LOADER] Contents:"
+              ls -laR /zinc-library/
+          volumeMounts:
+            - name: zinc-library
+              mountPath: /zinc-library
+            - name: catalog-data
+              mountPath: /catalog-data
+              readOnly: true
+      volumes:
+        - name: zinc-library
+          persistentVolumeClaim:
+            claimName: zinc-library-pvc
+        - name: catalog-data
+          hostPath:
+            path: /tmp/ocp-catalog
+            type: DirectoryOrCreate
