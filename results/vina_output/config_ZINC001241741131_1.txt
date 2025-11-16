@@ -1,0 +1,13 @@
+receptor = /workspace/receptor/receptor.pdbqt
+ligand   = /workspace/ligands/pdbqt/ZINC001241741131_1.pdbqt
+
+center_x = 0.0
+center_y = 0.0
+center_z = 0.0
+
+size_x = 20
+size_y = 20
+size_z = 20
+
+exhaustiveness = 8
+num_modes      = 9

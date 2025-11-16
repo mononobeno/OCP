@@ -4,26 +4,31 @@ metadata:
   name: vina-runner
   namespace: drug-pipeline
 spec:
+  backoffLimit: 0
   template:
     spec:
       restartPolicy: Never
       containers:
         - name: vina-runner
           image: pipeline/vina-runner:local
+          imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
                 name: pipeline-config
+          env:
+            - name: WORKSPACE
+              value: /workspace
+            - name: DB_PATH
+              value: /zinc-library/db/ocp_results.sqlite
           volumeMounts:
-            - name: work
+            - name: zinc-library-pvc
+              mountPath: /zinc-library
+            - name: work-pvc
               mountPath: /workspace
-          command:
-            - bash
-            - -c
-            - |
-              echo "[INFO] vina-runner: AutoDock Vina によるドッキング計算を行う想定"
-              # TODO: /workspace/vina_input を走査して vina を実行し /workspace/vina_output に結果を保存
       volumes:
-        - name: work
+        - name: zinc-library-pvc
+          persistentVolumeClaim:
+            claimName: zinc-library-pvc
+        - name: work-pvc
           persistentVolumeClaim:
             claimName: work-pvc
-  backoffLimit: 0

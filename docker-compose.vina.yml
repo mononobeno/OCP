@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  vina-runner:
+    build:
+      context: ./images/vina-runner
+      dockerfile: Dockerfile
+    image: vina-runner:latest
+    container_name: vina-runner-standalone
+    volumes:
+      # カタログデータベース
+      - ./catalog/db:/workspace/db:rw
+      # リガンドデータ
+      - ./catalog/libraries/zinc_2d_smi_v1/processed:/workspace/ligands:ro
+      # レセプター（ターゲット別に切り替え）
+      - ./catalog/targets/aps_apoh:/workspace/receptor:ro
+      # 結果出力
+      - ./results/vina_output:/workspace/vina_out:rw
+    environment:
+      - WORKSPACE=/workspace
+      - DB_PATH=/workspace/db/ocp_results.sqlite
+      - OCP_DB_PATH=/workspace/db/ocp_results.sqlite
+      - TARGET_CODE=aps_apoh
+      - LIB_CODE=zinc_2d_smi_v1
+      # RUN情報 (run_vina_docker_compose.shから渡される)
+      - RUN_ID=${RUN_ID}
+      - RUN_UUID=${RUN_UUID}
+      # Box parameters (ターゲット別に調整)
+      - CENTER_X=0.0
+      - CENTER_Y=0.0
+      - CENTER_Z=0.0
+      - SIZE_X=20
+      - SIZE_Y=20
+      - SIZE_Z=20
+      - VINA_CPU=4
+      - VINA_EXHAUSTIVENESS=8
+      - VINA_NUM_MODES=9
+    working_dir: /workspace
+    # CPUリソース制限（必要に応じて調整）
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '4'
+    #     reservations:
+    #       cpus: '2'

@@ -30,12 +30,14 @@ echo "[INFO] TARGET_CODE = $TARGET_CODE (id=$TARGET_ID)"
 echo "[INFO] LIB_CODE    = $LIB_CODE (id=$LIB_ID)"
 echo "[INFO] LIMIT       = $LIMIT"
 echo
+echo "# Selecting unused ligands with has_3d=1"
 echo "# ligand_id    zinc_id"
 
 sqlite3 "$DB" "
 SELECT l.id, l.zinc_id
 FROM ligands l
 WHERE l.library_id = $LIB_ID
+  AND l.has_3d = 1
   AND NOT EXISTS (
     SELECT 1
     FROM runs r

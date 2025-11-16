@@ -1,34 +1,44 @@
 # Database files
-*.sqlite
-*.sqlite-*
-*.db
-*.db-*
+catalog/db/*.sqlite
+catalog/db/*.sqlite-journal
 
-# Generated PDBQT files
-catalog/libraries/*/processed/pdbqt/*.pdbqt
-
-# Raw data archives
+# Large data files
 catalog/libraries/*/raw/*.tar.gz
-catalog/libraries/*/raw/*.smi.gz
+catalog/libraries/*/raw/*.smi
+catalog/libraries/*/raw/library_prepared/*.txt
+catalog/libraries/*/processed/pdbqt/
+catalog/libraries/*/processed/rdkit_3d/
+
+# Results
+results/vina_output/poses/*.pdbqt
+results/vina_output/logs/*.log
+results/gmx_input/*.pdb
+results/gmx_input/*.gro
+results/gmx_output/
 
 # Temporary files
-*.tmp
 /tmp/
-.vscode/
+*.tmp
+*.log
+nohup.out
 
-# Build artifacts
+# IDE
+.vscode/
+.idea/
+
+# Python
 __pycache__/
 *.pyc
 *.pyo
+.pytest_cache/
 
-# OS files
+# System
 .DS_Store
 Thumbs.db
 
-# Archive files
-*.tar.gz
-catalog-data.tar.gz
-
-# Specific large data files
-catalog/libraries/zinc_2d_smi_v1/raw/ZINC20-ML_smiles.tar.gz
-catalog/libraries/zinc_2d_smi_v1/raw/all_zinc20_ml_subset.smi
+# Keep directories but not contents
+!catalog/libraries/*/.gitkeep
+!results/vina_output/poses/.gitkeep
+!results/vina_output/logs/.gitkeep
+!results/gmx_input/.gitkeep
+!results/gmx_output/.gitkeep
