@@ -1,0 +1,5 @@
+a 1-1960
+name 20 Protein_Backbone
+a 1961-2010
+name 21 Ligand
+q

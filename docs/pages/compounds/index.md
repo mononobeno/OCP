@@ -1,37 +1,39 @@
 ---
 layout: default
-title: "MD Simulation Results"
+title: "Compound Analysis Results"
 ---
 
-# Molecular Dynamics Simulation Results
+# Prothrombin Inhibitor Screening Results
 
-## 50ns MD Simulations (Real GPU Calculations)
+[Target Protein: Prothrombin (F2)](../protein_prothrombin.html)
 
-### [Compound 1 - ZINC001241753219_1](compound_50ns_1.html)
-- **Affinity**: -0.002921 kcal/mol
-- **RMSD**: 0.142 nm
-- **Simulation**: 50 ns (Real GPU MD)
+## 解析済み化合物一覧
 
-### [Compound 2 - ZINC001241749345_1](compound_50ns_2.html)
-- **Affinity**: -0.0008763 kcal/mol
-- **RMSD**: 0.1165 nm
-- **Simulation**: 50 ns (Real GPU MD)
+### 10ns MD Simulation Results (Updated)
 
-### [Compound 3 - ZINC001241750201_1](compound_50ns_3.html)
-- **Affinity**: -0.0005371 kcal/mol
-- **RMSD**: 0.1285 nm
-- **Simulation**: 50 ns (Real GPU MD)
+1. [ZINC001241748223_1_10ns_v3](ZINC001241748223_1_10ns_v3_10ns.html) - Affinity:  kcal/mol, Ligand RMSD: N/A nm
+2. [ZINC001241748302_1_10ns_v3](ZINC001241748302_1_10ns_v3_10ns.html) - Affinity:  kcal/mol, Ligand RMSD: N/A nm
+3. [ZINC001241748464_1_10ns_v3](ZINC001241748464_1_10ns_v3_10ns.html) - Affinity:  kcal/mol, Ligand RMSD: N/A nm
+4. [ZINC001241750803_1_10ns_v3](ZINC001241750803_1_10ns_v3_10ns.html) - Affinity:  kcal/mol, Ligand RMSD: N/A nm
+5. [ZINC001241752370_1_10ns_v3](ZINC001241752370_1_10ns_v3_10ns.html) - Affinity:  kcal/mol, Ligand RMSD: N/A nm
 
+### 50ns MD Simulation Results
 
----
-
-## 10ns MD Simulations
-
-### [Real 10ns MD - ZINC001241750201_1](real_md_compound_1.html)
-- **RMSD**: 0.1018 nm
-- **Performance**: 346.6 ns/day
-- **Status**: ✅ First validation run
+1. [ZINC001241753219_1](compound_50ns_1.html) - 50ns MD, RMSD: 0.142 nm
+2. [ZINC001241749345_1](compound_50ns_2.html) - 50ns MD, RMSD: 0.117 nm (most stable)
+3. [ZINC001241750201_1](compound_50ns_3.html) - 50ns MD, RMSD: 0.129 nm
 
 ---
 
-[Back to Main Index](../../index.html)
+## 解析手法
+
+- **分子ドッキング**: AutoDock Vina
+- **MD計算**: GROMACS 2023.3 (GPU accelerated)
+- **力場**: OPLSAA
+- **水モデル**: SPC/E
+- **温度**: 300 K
+- **圧力**: 1 bar
+
+---
+
+[Back to Home](../../index.html)
