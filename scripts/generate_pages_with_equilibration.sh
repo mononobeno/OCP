@@ -129,32 +129,107 @@ NPT_SECTION
 
 ## Production MD Analysis
 
-### RMSD (Backbone Stability)
+### Multi-Scale RMSD Analysis
 
-<div id="rmsd-plot"></div>
+タンパク質の動きを複数のスケールで評価し、結合ポケット領域の安定性を確認します。
+
+<div id="multi-rmsd-plot" style="height:500px;"></div>
 
 <script>
 PROD_SECTION
 
-    # RMSD
+    # 複数のRMSDデータを収集
+    echo "const rmsdTraces = [];" >> "${COMPOUND_PAGE}"
+    
+    # Backbone RMSD
     if [[ -f "${mddir}/rmsd_backbone.xvg" ]]; then
-        echo "const rmsdData = {x: [" >> "${COMPOUND_PAGE}"
+        echo "rmsdTraces.push({x: [" >> "${COMPOUND_PAGE}"
         awk '/^[^@#]/ {printf "%s,", $1}' "${mddir}/rmsd_backbone.xvg" >> "${COMPOUND_PAGE}"
         echo "], y: [" >> "${COMPOUND_PAGE}"
         awk '/^[^@#]/ {printf "%s,", $2}' "${mddir}/rmsd_backbone.xvg" >> "${COMPOUND_PAGE}"
+        echo "], type: 'scatter', mode: 'lines', name: 'Backbone', line: {color: '#2E86AB', width: 2}});" >> "${COMPOUND_PAGE}"
+    fi
+    
+    # C-alpha RMSD
+    if [[ -f "${mddir}/rmsd_calpha.xvg" ]]; then
+        echo "rmsdTraces.push({x: [" >> "${COMPOUND_PAGE}"
+        awk '/^[^@#]/ {printf "%s,", $1}' "${mddir}/rmsd_calpha.xvg" >> "${COMPOUND_PAGE}"
+        echo "], y: [" >> "${COMPOUND_PAGE}"
+        awk '/^[^@#]/ {printf "%s,", $2}' "${mddir}/rmsd_calpha.xvg" >> "${COMPOUND_PAGE}"
+        echo "], type: 'scatter', mode: 'lines', name: 'C-alpha', line: {color: '#00A878', width: 2}});" >> "${COMPOUND_PAGE}"
+    fi
+    
+    # MainChain RMSD
+    if [[ -f "${mddir}/rmsd_mainchain.xvg" ]]; then
+        echo "rmsdTraces.push({x: [" >> "${COMPOUND_PAGE}"
+        awk '/^[^@#]/ {printf "%s,", $1}' "${mddir}/rmsd_mainchain.xvg" >> "${COMPOUND_PAGE}"
+        echo "], y: [" >> "${COMPOUND_PAGE}"
+        awk '/^[^@#]/ {printf "%s,", $2}' "${mddir}/rmsd_mainchain.xvg" >> "${COMPOUND_PAGE}"
+        echo "], type: 'scatter', mode: 'lines', name: 'MainChain', line: {color: '#F77F00', width: 2}});" >> "${COMPOUND_PAGE}"
+    fi
+    
+    # Pocket region RMSD
+    if [[ -f "${mddir}/rmsd_pocket.xvg" ]]; then
+        echo "rmsdTraces.push({x: [" >> "${COMPOUND_PAGE}"
+        awk '/^[^@#]/ {printf "%s,", $1}' "${mddir}/rmsd_pocket.xvg" >> "${COMPOUND_PAGE}"
+        echo "], y: [" >> "${COMPOUND_PAGE}"
+        awk '/^[^@#]/ {printf "%s,", $2}' "${mddir}/rmsd_pocket.xvg" >> "${COMPOUND_PAGE}"
+        echo "], type: 'scatter', mode: 'lines', name: 'Pocket Region', line: {color: '#C1121F', width: 3, dash: 'dot'}});" >> "${COMPOUND_PAGE}"
+    fi
+    
+    echo "Plotly.newPlot('multi-rmsd-plot', rmsdTraces, {title: 'RMSD Multi-Scale Analysis', xaxis: {title: 'Time (ns)'}, yaxis: {title: 'RMSD (nm)'}, hovermode: 'closest'});" >> "${COMPOUND_PAGE}"
+
+    cat >> "${COMPOUND_PAGE}" <<'POCKET_SECTION'
+</script>
+
+### Residue Flexibility (RMSF)
+
+各残基の揺らぎを示すRMSF。結合ポケット領域の柔軟性を評価できます。
+
+<div id="rmsf-plot" style="height:400px;"></div>
+
+<script>
+POCKET_SECTION
+
+    if [[ -f "${mddir}/rmsf.xvg" ]]; then
+        echo "const rmsfData = {x: [" >> "${COMPOUND_PAGE}"
+        awk '/^[^@#]/ {printf "%s,", $1}' "${mddir}/rmsf.xvg" >> "${COMPOUND_PAGE}"
+        echo "], y: [" >> "${COMPOUND_PAGE}"
+        awk '/^[^@#]/ {printf "%s,", $2}' "${mddir}/rmsf.xvg" >> "${COMPOUND_PAGE}"
         echo "]};" >> "${COMPOUND_PAGE}"
-        echo "Plotly.newPlot('rmsd-plot', [{x: rmsdData.x, y: rmsdData.y, type: 'scatter', mode: 'lines', name: 'RMSD'}], {title: 'Backbone RMSD', xaxis: {title: 'Time (ns)'}, yaxis: {title: 'RMSD (nm)'}});" >> "${COMPOUND_PAGE}"
+        echo "Plotly.newPlot('rmsf-plot', [{x: rmsfData.x, y: rmsfData.y, type: 'scatter', mode: 'lines', name: 'RMSF', line: {color: '#9D4EDD', width: 2}, fill: 'tozeroy', fillcolor: 'rgba(157,78,221,0.2)'}], {title: 'Residue Flexibility (RMSF)', xaxis: {title: 'Residue Number'}, yaxis: {title: 'RMSF (nm)'}});" >> "${COMPOUND_PAGE}"
     fi
 
     cat >> "${COMPOUND_PAGE}" <<'HBOND_SECTION'
 </script>
 
-### Hydrogen Bonds (Protein-Protein)
+### Radius of Gyration
 
-<div id="hbond-plot"></div>
+タンパク質のコンパクトさを示す回転半径。
+
+<div id="gyrate-plot" style="height:400px;"></div>
 
 <script>
 HBOND_SECTION
+
+    if [[ -f "${mddir}/gyrate.xvg" ]]; then
+        echo "const gyrateData = {x: [" >> "${COMPOUND_PAGE}"
+        awk '/^[^@#]/ {printf "%s,", $1}' "${mddir}/gyrate.xvg" >> "${COMPOUND_PAGE}"
+        echo "], y: [" >> "${COMPOUND_PAGE}"
+        awk '/^[^@#]/ {printf "%s,", $2}' "${mddir}/gyrate.xvg" >> "${COMPOUND_PAGE}"
+        echo "]};" >> "${COMPOUND_PAGE}"
+        echo "Plotly.newPlot('gyrate-plot', [{x: gyrateData.x, y: gyrateData.y, type: 'scatter', mode: 'lines', name: 'Rg', line: {color: '#06A77D', width: 2}}], {title: 'Protein Compactness (Radius of Gyration)', xaxis: {title: 'Time (ns)'}, yaxis: {title: 'Rg (nm)'}});" >> "${COMPOUND_PAGE}"
+    fi
+
+    cat >> "${COMPOUND_PAGE}" <<'HBOND_FINAL_SECTION'
+</script>
+
+### Hydrogen Bonds (Protein Stability)
+
+<div id="hbond-plot" style="height:400px;"></div>
+
+<script>
+HBOND_FINAL_SECTION
 
     # H-bonds
     if [[ -f "${mddir}/hbond.xvg" ]]; then
@@ -163,7 +238,7 @@ HBOND_SECTION
         echo "], y: [" >> "${COMPOUND_PAGE}"
         awk '/^[^@#]/ {printf "%s,", $2}' "${mddir}/hbond.xvg" >> "${COMPOUND_PAGE}"
         echo "]};" >> "${COMPOUND_PAGE}"
-        echo "Plotly.newPlot('hbond-plot', [{x: hbondData.x, y: hbondData.y, type: 'scatter', mode: 'lines', name: 'H-bonds', line: {color: 'orange'}}], {title: 'Hydrogen Bonds', xaxis: {title: 'Time (ns)'}, yaxis: {title: 'Count'}});" >> "${COMPOUND_PAGE}"
+        echo "Plotly.newPlot('hbond-plot', [{x: hbondData.x, y: hbondData.y, type: 'scatter', mode: 'lines', name: 'H-bonds', line: {color: '#FF6B35', width: 2}}], {title: 'Hydrogen Bonds', xaxis: {title: 'Time (ns)'}, yaxis: {title: 'Count'}});" >> "${COMPOUND_PAGE}"
     fi
 
     echo "</script>" >> "${COMPOUND_PAGE}"

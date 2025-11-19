@@ -42,3 +42,9 @@ Thumbs.db
 !results/vina_output/logs/.gitkeep
 !results/gmx_input/.gitkeep
 !results/gmx_output/.gitkeep
+
+# MD trajectory files (too large for GitHub)
+results/md_output/**/*.xtc
+results/md_output/**/*.trr
+results/md_output/**/*.edr
+results/md_output/**/*.cpt

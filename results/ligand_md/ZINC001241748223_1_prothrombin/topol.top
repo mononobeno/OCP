@@ -1,0 +1,7 @@
+#include "/usr/share/gromacs/top/oplsaa.ff/forcefield.itp"
+
+[ moleculetype ]
+; Name            nrexcl
+LIG                 3
+
+[ atoms ]

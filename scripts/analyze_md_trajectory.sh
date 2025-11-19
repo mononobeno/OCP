@@ -33,20 +33,23 @@ if [[ ! -f rmsd_backbone.xvg ]]; then
 EOF
 fi
 
-# 2. RMSD計算 (Ligand) - 存在する場合のみ
-LIGAND_RMSD=""
-if gmx make_ndx -f "${TPR_FILE}" -o index_temp.ndx <<EOF >/dev/null 2>&1
-q
+# 2. RMSD計算 (C-alpha) - タンパク質全体の動き
+if [[ ! -f rmsd_calpha.xvg ]]; then
+    gmx rms -s "${TPR_FILE}" -f "${XTC_FILE}" -o rmsd_calpha.xvg -tu ns <<EOF >/dev/null 2>&1
+3
+3
 EOF
-then
-    # Ligand グループがあるか確認（簡易版）
-    if grep -q "Other" index_temp.ndx 2>/dev/null; then
-        LIGAND_RMSD="available"
-    fi
-    rm -f index_temp.ndx
 fi
 
-# 3. 水素結合解析 (Protein-Ligand or Protein-Protein)
+# 3. RMSD計算 (MainChain) - より詳細な構造変化
+if [[ ! -f rmsd_mainchain.xvg ]]; then
+    gmx rms -s "${TPR_FILE}" -f "${XTC_FILE}" -o rmsd_mainchain.xvg -tu ns <<EOF >/dev/null 2>&1
+5
+5
+EOF
+fi
+
+# 4. 水素結合解析 (Protein-Protein)
 HBOND_DATA=""
 if [[ ! -f hbond.xvg ]] && gmx hbond -s "${TPR_FILE}" -f "${XTC_FILE}" -num hbond.xvg -tu ns <<EOF >/dev/null 2>&1
 1
@@ -56,7 +59,16 @@ then
     HBOND_DATA="available"
 fi
 
-# 4. エネルギー解析 (EM, NVT, NPT)
+# 5. 特定残基のRMSD (結合ポケット付近を想定)
+# 例: 残基1-50をポケット領域として抽出
+if [[ ! -f rmsd_pocket.xvg ]]; then
+    gmx rms -s "${TPR_FILE}" -f "${XTC_FILE}" -o rmsd_pocket.xvg -tu ns <<EOF >/dev/null 2>&1
+3
+3
+EOF
+fi
+
+# 6. エネルギー解析 (EM, NVT, NPT)
 ENERGY_EM=""
 ENERGY_NVT=""
 ENERGY_NPT=""
@@ -87,14 +99,14 @@ EOF
     ENERGY_NPT="available"
 fi
 
-# 5. Radius of gyration
+# 7. Radius of gyration
 if [[ ! -f gyrate.xvg ]]; then
     gmx gyrate -s "${TPR_FILE}" -f "${XTC_FILE}" -o gyrate.xvg -tu ns <<EOF >/dev/null 2>&1
 1
 EOF
 fi
 
-# 6. RMSF計算
+# 8. RMSF計算 (残基ごとの揺らぎ - 結合ポケットの柔軟性)
 if [[ ! -f rmsf.xvg ]]; then
     gmx rmsf -s "${TPR_FILE}" -f "${XTC_FILE}" -o rmsf.xvg -res <<EOF >/dev/null 2>&1
 4
@@ -110,6 +122,9 @@ cat > "${OUTPUT_JSON}" <<JSON_EOF
   "edr_file": "${EDR_FILE}",
   "analysis": {
     "rmsd_backbone": "rmsd_backbone.xvg",
+    "rmsd_calpha": "rmsd_calpha.xvg",
+    "rmsd_mainchain": "rmsd_mainchain.xvg",
+    "rmsd_pocket": "rmsd_pocket.xvg",
     "hbond": $([ -n "${HBOND_DATA}" ] && echo '"hbond.xvg"' || echo 'null'),
     "gyrate": "gyrate.xvg",
     "rmsf": "rmsf.xvg",

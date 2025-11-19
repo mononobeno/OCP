@@ -1,0 +1,32 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: test-md-pipeline
+  namespace: drug-pipeline
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: md-test
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: gromacs-md
+        image: gromacs-mpi-cuda:local
+        imagePullPolicy: Never
+        command: ["/bin/bash", "-c"]
+        args:
+          - |
+            echo "=== MD Pipeline Test in Container ==="
+            echo "Container: gromacs-mpi-cuda:local"
+            echo "Hostname: $(hostname)"
+            /usr/local/gromacs/bin/gmx_mpi --version 2>&1 | head -10
+            echo "✅ GROMACS confirmed in container"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"

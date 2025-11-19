@@ -1,0 +1,20 @@
+{
+  "md_dir": ".",
+  "tpr_file": "md.tpr",
+  "xtc_file": "md.xtc",
+  "edr_file": "",
+  "analysis": {
+    "rmsd_backbone": "rmsd_backbone.xvg",
+    "rmsd_calpha": "rmsd_calpha.xvg",
+    "rmsd_mainchain": "rmsd_mainchain.xvg",
+    "rmsd_pocket": "rmsd_pocket.xvg",
+    "hbond": null,
+    "gyrate": "gyrate.xvg",
+    "rmsf": "rmsf.xvg",
+    "energy_em": null,
+    "energy_nvt_temp": null,
+    "energy_nvt_potential": null,
+    "energy_npt_pressure": null,
+    "energy_npt_density": null
+  }
+}
